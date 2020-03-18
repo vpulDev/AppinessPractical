@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
 
     //Kotlin Standard library
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
