@@ -1,6 +1,5 @@
 package com.app.task.adapter
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -10,8 +9,7 @@ import com.app.task.api.responsemodel.EnterpriseListResponse
 import com.app.task.databinding.ListItemEnterpriseBinding
 
 class EnterpriseListAdapter(
-    private val activity: Activity,
-    private val data: ArrayList<EnterpriseListResponse>
+    private var data: ArrayList<EnterpriseListResponse>
 ) : RecyclerView.Adapter<EnterpriseListAdapter.EnterpriseListVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EnterpriseListVH {
@@ -31,6 +29,10 @@ class EnterpriseListAdapter(
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun updateData(data: ArrayList<EnterpriseListResponse>) {
+        this.data = data
     }
 
     inner class EnterpriseListVH(val binding: ListItemEnterpriseBinding) :

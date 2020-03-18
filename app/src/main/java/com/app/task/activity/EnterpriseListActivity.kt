@@ -1,6 +1,7 @@
 package com.app.task.activity
 
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
@@ -12,12 +13,14 @@ import com.app.task.base.BaseActivity
 import com.app.task.base.Status
 import com.app.task.utils.Utils
 import com.app.task.viewmodel.EnterpriseListViewModel
+import com.miguelcatalan.materialsearchview.MaterialSearchView
 import kotlinx.android.synthetic.main.activity_enterprise_list.*
+import kotlinx.android.synthetic.main.toolbar.*
 
 
 class EnterpriseListActivity : BaseActivity() {
 
-    private lateinit var enterpriseListAdapter: EnterpriseListAdapter
+    private var enterpriseListAdapter: EnterpriseListAdapter? = null
     private lateinit var enterpriseListViewModel: EnterpriseListViewModel
     private lateinit var enterpriseList: ArrayList<EnterpriseListResponse>
 
@@ -25,10 +28,41 @@ class EnterpriseListActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enterprise_list)
 
+        setSupportActionBar(toolbar)
+
         enterpriseListViewModel =
             ViewModelProvider(this).get(EnterpriseListViewModel::class.java)
 
         callEnterpriseListAPI()
+
+        searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                searchEnterpriseList(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                searchEnterpriseList(newText)
+                return false
+            }
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+
+        val item = menu.findItem(R.id.action_search)
+        searchView.setMenuItem(item)
+
+        return true
+    }
+
+    override fun onBackPressed() {
+        if (searchView.isSearchOpen) {
+            searchView.closeSearch()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     private fun callEnterpriseListAPI() {
@@ -49,7 +83,7 @@ class EnterpriseListActivity : BaseActivity() {
                         model.title
                     })
                     enterpriseListAdapter =
-                        EnterpriseListAdapter(this, enterpriseList)
+                        EnterpriseListAdapter(enterpriseList)
                     rv_enterprise_list.adapter = enterpriseListAdapter
                 }
             })
@@ -60,13 +94,13 @@ class EnterpriseListActivity : BaseActivity() {
 
     private fun showNoNetworkDialog() {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.app_name)
-        builder.setMessage(R.string.no_internet_connection_available)
-        builder.setPositiveButton(getString(R.string.retry)) { dialogInterface, which ->
+        builder.setTitle(com.app.task.R.string.app_name)
+        builder.setMessage(com.app.task.R.string.no_internet_connection_available)
+        builder.setPositiveButton(getString(com.app.task.R.string.retry)) { dialogInterface, which ->
             dialogInterface.dismiss()
             callEnterpriseListAPI()
         }
-        builder.setNegativeButton(getString(R.string.exit)) { dialogInterface, which ->
+        builder.setNegativeButton(getString(com.app.task.R.string.exit)) { dialogInterface, which ->
             dialogInterface.dismiss()
             finish()
         }
@@ -75,4 +109,15 @@ class EnterpriseListActivity : BaseActivity() {
         alertDialog.show()
     }
 
+    private fun searchEnterpriseList(keyword: String) {
+        if (keyword.isBlank()) {
+            enterpriseListAdapter?.updateData(enterpriseList)
+        } else {
+            val filterList = ArrayList(enterpriseList.filter {
+                it.title!!.startsWith(keyword, ignoreCase = true)
+            })
+            enterpriseListAdapter?.updateData(filterList)
+        }
+        enterpriseListAdapter?.notifyDataSetChanged()
+    }
 }
