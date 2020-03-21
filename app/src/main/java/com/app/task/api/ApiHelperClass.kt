@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit
 class ApiHelperClass private constructor() {
 
     private var apiService: ApiCallInterface
+    private val BASE_URL : String = "https://www.enterprisesmail.com/json/"
 
     init {
         val timeOut: Long = 30 * 1000
@@ -28,7 +29,7 @@ class ApiHelperClass private constructor() {
             okHttpClientBuilder.addInterceptor(interceptor)
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://www.enterprisesmail.com/json/")
+            .baseUrl(BASE_URL)
             .client(okHttpClientBuilder.build())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())

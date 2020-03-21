@@ -1,18 +1,17 @@
 package com.app.task.viewmodel
 
-import org.junit.After
+import androidx.lifecycle.Observer
+import com.app.task.api.responsemodel.EnterpriseListResponse
+import com.app.task.base.APIResource
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 
 class EnterpriseListViewModelTest {
 
-    @Before
-    fun setUp() {
-    }
-
-    @After
-    fun tearDown() {
-    }
+    private lateinit var enterpriseListViewModel: EnterpriseListViewModel
 
     @Test
     fun onCleared() {
@@ -22,7 +21,22 @@ class EnterpriseListViewModelTest {
     fun clear() {
     }
 
+    @Before
+    fun beforeTest() {
+        enterpriseListViewModel = EnterpriseListViewModel()
+    }
+
     @Test
-    fun onCleared1() {
+    fun callEnterPriseListAPI() {
+        GlobalScope.launch {
+            enterpriseListViewModel.callEnterPriseListAPI()
+                .observeForever(object : Observer<APIResource<ArrayList<EnterpriseListResponse>>> {
+                    override fun onChanged(t: APIResource<ArrayList<EnterpriseListResponse>>?) {
+                        if (t?.data != null) {
+                            assertNotNull(t.data)
+                        }
+                    }
+                })
+        }
     }
 }

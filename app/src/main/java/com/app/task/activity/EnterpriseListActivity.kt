@@ -20,9 +20,11 @@ import kotlinx.android.synthetic.main.toolbar.*
 
 class EnterpriseListActivity : BaseActivity() {
 
+    //region Declarations
     private var enterpriseListAdapter: EnterpriseListAdapter? = null
     private lateinit var enterpriseListViewModel: EnterpriseListViewModel
     private lateinit var enterpriseList: ArrayList<EnterpriseListResponse>
+    //endregion
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +32,22 @@ class EnterpriseListActivity : BaseActivity() {
 
         setSupportActionBar(toolbar)
 
-        enterpriseListViewModel =
-            ViewModelProvider(this).get(EnterpriseListViewModel::class.java)
+        initViewModel()
 
         callEnterpriseListAPI()
 
+        searchViewQueryListener()
+    }
+
+    //region Initialization for ViewModel
+    private fun initViewModel() {
+        enterpriseListViewModel =
+            ViewModelProvider(this).get(EnterpriseListViewModel::class.java)
+    }
+    //endregion
+
+    //region SearchView Query Text Listener
+    private fun searchViewQueryListener() {
         searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 searchEnterpriseList(query)
@@ -47,6 +60,7 @@ class EnterpriseListActivity : BaseActivity() {
             }
         })
     }
+    //endregion
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
@@ -65,6 +79,7 @@ class EnterpriseListActivity : BaseActivity() {
         }
     }
 
+    //region Invoke API for Enterprise List
     private fun callEnterpriseListAPI() {
         if (Utils.isNetworkAvailable()) {
             enterpriseListViewModel.callEnterPriseListAPI().observe(this, Observer { response ->
@@ -91,6 +106,7 @@ class EnterpriseListActivity : BaseActivity() {
             showNoNetworkDialog()
         }
     }
+    //endregion
 
     private fun showNoNetworkDialog() {
         val builder = AlertDialog.Builder(this)
